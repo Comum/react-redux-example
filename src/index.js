@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 
+
 // ACTIONS
 const INCREMENT = "INCREMENT";
 const DECREMENT = "DECREMENT";
@@ -11,9 +12,9 @@ const DECREMENT = "DECREMENT";
 const counter = (state = 100, action) => {
     switch(action.type) {
         case 'INCREMENT':
-            return state + 1;
+            return action.state + 1;
         case 'DECREMENT':
-            return state - 1;
+            return action.state - 1;
         default:
             return state;
     }
@@ -22,39 +23,44 @@ const counter = (state = 100, action) => {
 // STORE CREATION
 const store = createStore(counter);
 
-// DISPATCHERS
-const incrementing = (state) => {
-    store.dispatch({ type: INCREMENT });
-}
-
-const decrementing = () => {
-    store.dispatch({ type: DECREMENT });
-}
-
 // COMPONENT
+class Counter extends React.Component {
+    // DISPATCHERS
+    onIncrement = () => {
+        store.dispatch({
+            state: this.props.value,
+            type: INCREMENT
+        })
+    }
 
-const Counter = ({
-    value,
-    onIncrement,
-    onDecrement
-}) => (
-    <div>
-        <h1>Simple Counter</h1>
-        <h1>{value}</h1>
-        <button onClick={onIncrement}>+</button>
-        <button onClick={onDecrement}>-</button>
-    </div>
-);
+    onDecrement = () => {
+        store.dispatch({
+            state: this.props.value,
+            type: DECREMENT
+        })
+    }
+
+    render() {
+        return (
+            <div>
+                <h1>{this.props.title}</h1>
+                <h2>{this.props.value}</h2>
+                <button onClick={this.onIncrement}>+</button>
+                <button onClick={this.onDecrement}>-</button>
+            </div>
+        );
+    }
+}
 
 const render = () => {
     ReactDOM.render((
         <Counter
+            title="Simple Counter"
             value={store.getState()}
-            onIncrement={incrementing}
-            onDecrement={decrementing}
         />
-    ), document.getElementById('app'));
+    ), document.getElementById('root'));
 }
 
 store.subscribe(render);
 render();
+
